@@ -115,20 +115,6 @@ a.card .stage.mini+.tag{margin-top:0}
 [data-theme=dark] .tag.free{background:#10382b;color:#6fe0b0}
 .theme-btn{background:none;border:1px solid var(--line);border-radius:6px;width:36px;height:36px;margin-left:6px;cursor:pointer;color:var(--ink);font-size:16px;line-height:1}
 .theme-btn:hover{border-color:var(--brand)}
-
-/* follow OS unless the user picked a theme */
-@media (prefers-color-scheme:dark){
-:root:not([data-theme=light]){color-scheme:dark;--bg:#0b1424;--alt:#0f1a2e;--surface:#111e36;--ink:#eef3fb;--muted:#98a6c0;--line:#1f2d49;--brand:#6d8dff;--brand-ink:#8aa5ff;--soft:#0f1a2e;--shadow:none}
-:root:not([data-theme=light]) .stage{background:linear-gradient(135deg,#17284d,#2a1f4d 55%,#40203a)}
-:root:not([data-theme=light]) .win{background:#111e36;border-color:#24365a}
-:root:not([data-theme=light]) .wbar,:root:not([data-theme=light]) .win th{background:#0f1a2e}:root:not([data-theme=light]) .wbar i{background:#2a3b5f}
-:root:not([data-theme=light]) .win td{border-color:#1f2d49}:root:not([data-theme=light]) .win td.r{color:var(--ink)}
-:root:not([data-theme=light]) .win li.on,:root:not([data-theme=light]) .kick,:root:not([data-theme=light]) .tag{background:#1a2a55}
-:root:not([data-theme=light]) .float{background:#111e36;color:var(--ink)}
-:root:not([data-theme=light]) .btn.ghost{background:transparent;border-color:#2f4270}
-:root:not([data-theme=light]) input,:root:not([data-theme=light]) textarea,:root:not([data-theme=light]) select{border-color:#2f4270}
-:root:not([data-theme=light]) .tag.free{background:#10382b;color:#6fe0b0}
-}
 .small-note{font-size:14px;margin:14px 0 0}
 .card.prod{display:flex;flex-direction:column;padding:0;overflow:hidden}
 .card.prod .cardlink{display:block;padding:22px 22px 8px;color:inherit;text-decoration:none;flex:1}

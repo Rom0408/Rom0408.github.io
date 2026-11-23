@@ -7,7 +7,7 @@
 
   var tb = $('theme');
   if (tb) tb.addEventListener('click', function () {
-    var d = document.documentElement, cur = d.getAttribute('data-theme') || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'), nx = cur === 'dark' ? 'light' : 'dark';
+    var d = document.documentElement, cur = d.getAttribute('data-theme') || 'light', nx = cur === 'dark' ? 'light' : 'dark';
     d.setAttribute('data-theme', nx);
     try { localStorage.setItem('theme', nx); } catch (e) {}
   });
