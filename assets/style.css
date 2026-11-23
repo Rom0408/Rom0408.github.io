@@ -27,7 +27,7 @@ main{max-width:1160px;margin:0 auto;border-left:1px solid var(--line);border-rig
 @media(max-width:1200px){main{border:0}}
 .hero{position:relative;overflow:hidden;padding:96px 0 84px;border-bottom:1px solid var(--line)}
 .hero .wrap{position:relative;z-index:1}
-@media(max-width:800px){.hero h1,.hero p.lead{max-width:640px}
+.hero h1,.hero p.lead{max-width:640px}
 .hero p.lead{font-size:clamp(17px,2vw,20px);color:var(--muted);margin:0 0 28px}
 .pill{display:inline-block;color:var(--brand-ink);font-weight:600;font-size:14px;margin-bottom:18px}
 .cta-row{display:flex;gap:10px;flex-wrap:wrap}
