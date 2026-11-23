@@ -524,3 +524,154 @@ function SHEKELWORDS(amount) {
 
 function invalidIdRows_(values, col) { var bad = []; values.forEach(function (r, i) { if (String(r[col]).trim() !== '' && !idValid_(r[col])) bad.push(i); }); return bad; }
 if (typeof module !== 'undefined') module.exports = {};
+
+/** Hebrew text fixers: wrong-keyboard repair, final letters, bidi marks. Offline. */
+var KB_EN = "qwertyuiopasdfghjkl;'zxcvbnm,./";
+var KB_HE = "/'קראטוןםפשדגכעיחלךף,זסבהנמצתץ.";
+var HEB_RANGE = /[א-ת]/;
+
+function mapT_(x, fn) {
+  if (Array.isArray(x)) return x.map(function (r) { return Array.isArray(r) ? r.map(function (c) { return mapT_(c, fn); }) : mapT_(r, fn); });
+  return fn(x);
+}
+function toHeb_(s) { return s.replace(/[A-Za-z;',./]/g, function (c) { var i = KB_EN.indexOf(c.toLowerCase()); return i < 0 ? c : KB_HE.charAt(i); }); }
+function toEng_(s) { return s.replace(/[א-ת,.';\/]/g, function (c) { var i = KB_HE.indexOf(c); return i < 0 ? c : KB_EN.charAt(i); }); }
+
+/** Text typed on an English keyboard while meaning Hebrew -> Hebrew. @customfunction */
+function KBTOHEB(text) { return mapT_(text, function (v) { return toHeb_(String(v)); }); }
+/** Text typed on a Hebrew keyboard while meaning English -> English. @customfunction */
+function KBTOENG(text) { return mapT_(text, function (v) { return toEng_(String(v)); }); }
+/** Auto: Latin-only text becomes Hebrew, Hebrew-only text becomes English. @customfunction */
+function KBFIX(text) {
+  return mapT_(text, function (v) {
+    var s = String(v), he = HEB_RANGE.test(s), en = /[A-Za-z]/.test(s);
+    return he && !en ? toEng_(s) : en && !he ? toHeb_(s) : s;
+  });
+}
+
+var SOFIT = {'כ': 'ך', 'מ': 'ם', 'נ': 'ן', 'פ': 'ף', 'צ': 'ץ'}, UNSOFIT = {'ך': 'כ', 'ם': 'מ', 'ן': 'נ', 'ף': 'פ', 'ץ': 'צ'};
+/** Fix final letters (sofit) at word ends and remove them mid-word. @customfunction */
+function FIXSOFIT(text) {
+  return mapT_(text, function (v) {
+    return String(v).replace(/[א-ת]+/g, function (w) {
+      var a = w.split('');
+      for (var i = 0; i < a.length; i++) {
+        var last = i === a.length - 1;
+        if (last && SOFIT[a[i]]) a[i] = SOFIT[a[i]];
+        else if (!last && UNSOFIT[a[i]]) a[i] = UNSOFIT[a[i]];
+      }
+      return a.join('');
+    });
+  });
+}
+/** Remove invisible bidi control marks (LRM, RLM, embeddings). @customfunction */
+function STRIPBIDI(text) { return mapT_(text, function (v) { return String(v).replace(/[‎‏‪-‮⁦-⁩]/g, ''); }); }
+/** TRUE if the text contains Hebrew letters. @customfunction */
+function ISHEBREW(text) { return mapT_(text, function (v) { return HEB_RANGE.test(String(v)); }); }
+/** Share of letters that are Hebrew (0-1). @customfunction */
+function HEBSHARE(text) {
+  return mapT_(text, function (v) {
+    var s = String(v), h = (s.match(/[א-ת]/g) || []).length, l = (s.match(/[A-Za-zא-ת]/g) || []).length;
+    return l ? Math.round(h / l * 1000) / 1000 : 0;
+  });
+}
+/** Hebrew letters only, nikud removed. @customfunction */
+function HEBONLY(text) { return mapT_(text, function (v) { return String(v).replace(/[^א-ת\s]/g, '').replace(/\s+/g, ' ').trim(); }); }
+if (typeof module !== 'undefined') module.exports = {};
+
+/* Israeli workdays & dates. Week = Sun-Thu (weekend Fri-Sat) by default; weekend "intl" = Sat-Sun. Uses Hebrew.gs. */
+var WD_OFF_ = {'7-1': 1, '7-10': 1, '7-15': 1, '7-22': 1, '1-15': 1, '1-21': 1, '2-5': 1, '3-6': 1};
+
+function mapW_(v, f) { return Array.isArray(v) ? v.map(function (r) { return Array.isArray(r) ? r.map(function (c) { return mapW_(c, f); }) : mapW_(r, f); }) : f(v); }
+function dOk_(d) { return d instanceof Date && !isNaN(d); }
+function dayOff_(d) { // Israeli public holiday (full day off)
+  var h = hebFromFixed_(gregToFixed_(d.getFullYear(), d.getMonth() + 1, d.getDate())), k = h.m + '-' + h.d;
+  if (WD_OFF_[k]) return true;
+  if (h.m === 7 && h.d >= 16 && h.d <= 21) return true; // chol hamoed Sukkot
+  if (h.m === 1 && h.d >= 16 && h.d <= 20) return true; // chol hamoed Pesach
+  return false;
+}
+function weekendDay_(d, wk) { var w = d.getDay(); return wk === 'intl' ? (w === 0 || w === 6) : (w === 5 || w === 6); }
+function isWork_(d, wk, hol) { return !weekendDay_(d, wk) && !(hol !== false && dayOff_(d)); }
+function dayAdd_(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+function dayKey_(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+/**
+ * TRUE if the date is a working day in Israel (Sun-Thu, not a public holiday).
+ * @param {Date} date
+ * @param {string} weekend "il" (Fri-Sat, default) or "intl" (Sat-Sun)
+ * @customfunction
+ */
+function ILISWORKDAY(date, weekend) { return mapW_(date, function (d) { return dOk_(d) ? isWork_(d, weekend) : ''; }); }
+
+/**
+ * Number of working days between two dates, inclusive.
+ * @customfunction
+ */
+function ILWORKDAYS(start, end, weekend) {
+  if (!dOk_(start) || !dOk_(end)) return '';
+  var a = dayKey_(start), b = dayKey_(end), sign = 1, n = 0;
+  if (a > b) { var t = a; a = b; b = t; sign = -1; }
+  for (var d = a; d <= b; d = dayAdd_(d, 1)) if (isWork_(d, weekend)) n++;
+  return sign * n;
+}
+
+/**
+ * Date after adding N working days (negative goes back).
+ * @customfunction
+ */
+function ILADDWORKDAYS(date, days, weekend) {
+  if (!dOk_(date) || isNaN(Number(days))) return '';
+  var n = Math.trunc(Number(days)), step = n < 0 ? -1 : 1, d = dayKey_(date);
+  while (n !== 0) { d = dayAdd_(d, step); if (isWork_(d, weekend)) n -= step; }
+  return d;
+}
+
+/**
+ * Next working day strictly after the date.
+ * @customfunction
+ */
+function ILNEXTWORKDAY(date, weekend) { return ILADDWORKDAYS(date, 1, weekend); }
+
+/**
+ * Whole years between birth date and today (or as-of date).
+ * @customfunction
+ */
+function AGEYEARS(birth, asOf) { return mapW_(birth, function (b) { return ageParts_(b, asOf) ? ageParts_(b, asOf).y : ''; }); }
+
+/**
+ * Age as "34y 2m 5d".
+ * @customfunction
+ */
+function AGEYMD(birth, asOf) { return mapW_(birth, function (b) { var p = ageParts_(b, asOf); return p ? p.y + 'y ' + p.m + 'm ' + p.d + 'd' : ''; }); }
+
+function ageParts_(b, asOf) {
+  var e = asOf === undefined || asOf === '' ? new Date() : asOf;
+  if (!dOk_(b) || !dOk_(e) || dayKey_(b) > dayKey_(e)) return null;
+  var tm = (e.getFullYear() - b.getFullYear()) * 12 + e.getMonth() - b.getMonth();
+  function at(k) { var t = b.getMonth() + k, yy = b.getFullYear() + Math.floor(t / 12), mm = ((t % 12) + 12) % 12; return new Date(yy, mm, Math.min(b.getDate(), new Date(yy, mm + 1, 0).getDate())); }
+  if (at(tm) > dayKey_(e)) tm--;
+  var d = Math.round((dayKey_(e) - at(tm)) / 86400000), y = Math.floor(tm / 12), m = tm % 12;
+  return {y: y, m: m, d: d};
+}
+
+/**
+ * Gregorian date of the Hebrew birthday in a given Gregorian year (the Hebrew date that year's Hebrew-year contains).
+ * @param {Date} birth
+ * @param {number} year Gregorian year (default: this year)
+ * @customfunction
+ */
+function HEBBIRTHDAY(birth, year) {
+  if (!dOk_(birth)) return '';
+  var h = hebFromFixed_(gregToFixed_(birth.getFullYear(), birth.getMonth() + 1, birth.getDate()));
+  var y = Number(year) || new Date().getFullYear(), best = null;
+  for (var hy = y + 3760; hy <= y + 3761; hy++) {
+    var m = h.m, d = h.d;
+    if (m === 13 && !hebLeap_(hy)) m = 12;
+    if (m === 12 && hebLeap_(hy) && h.m === 12 && !hebLeap_(h.y)) m = 13;
+    if (d > hebMonthLen_(hy, m)) d = hebMonthLen_(hy, m);
+    var f = hebToFixed_(hy, m, d), g = new Date((f - RD_UNIX) * 86400000), dt = new Date(g.getUTCFullYear(), g.getUTCMonth(), g.getUTCDate());
+    if (dt.getFullYear() === y) best = dt;
+  }
+  return best || '';
+}

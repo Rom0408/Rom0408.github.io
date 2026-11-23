@@ -7,9 +7,9 @@
 
   var tb = $('theme');
   if (tb) tb.addEventListener('click', function () {
-    var d = document.documentElement, dark = d.getAttribute('data-theme') === 'dark';
-    if (dark) d.removeAttribute('data-theme'); else d.setAttribute('data-theme', 'dark');
-    try { localStorage.setItem('theme', dark ? 'light' : 'dark'); } catch (e) {}
+    var d = document.documentElement, cur = d.getAttribute('data-theme') || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'), nx = cur === 'dark' ? 'light' : 'dark';
+    d.setAttribute('data-theme', nx);
+    try { localStorage.setItem('theme', nx); } catch (e) {}
   });
   var menu = document.querySelector('.menu-btn');
   if (menu) menu.addEventListener('click', function () { document.querySelector('nav.main').classList.toggle('open'); });
@@ -101,6 +101,41 @@
       $('out').textContent = L.map(function (l) { var v = idValid_(l); if (v) ok++; return (v ? '✅ ' : '❌ ') + l.trim(); }).join('\n') + '\n\n' + ok + ' of ' + L.length + ' valid';
     };
     ii.addEventListener('input', ic); ic();
+  }
+
+  if (kind === 'kbfix') {
+    var ki = $('i'), ko = $('o');
+    var kr = function () {
+      var m = $('mode').value, f = m === 'heb' ? toHeb_ : m === 'eng' ? toEng_ : function (s) { return KBFIX(s); };
+      var v = ki.value.split('\n').map(function (l) { return f(l); }).join('\n');
+      ko.value = $('sofit').checked ? FIXSOFIT(v) : v;
+    };
+    ki.addEventListener('input', kr); $('mode').addEventListener('change', kr); $('sofit').addEventListener('change', kr); kr();
+  }
+
+  function pd(v) { var p = (v || '').split('-'); return p.length === 3 ? new Date(+p[0], +p[1] - 1, +p[2]) : null; }
+  function fd(d) { return d && d.toLocaleDateString('en-GB', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'}); }
+  if (kind === 'workdays') {
+    var ws = $('s'), we = $('e'), wn = $('n'), wk = $('wk'), now = new Date(), pad = function (x) { return ('0' + x).slice(-2); };
+    ws.value = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+    var e2 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 30); we.value = e2.getFullYear() + '-' + pad(e2.getMonth() + 1) + '-' + pad(e2.getDate());
+    var wr = function () {
+      var s = pd(ws.value), e = pd(we.value), w = wk.value, n = parseInt(wn.value, 10);
+      $('cnt').innerHTML = s && e ? '<small>Working days (inclusive)</small>' + ILWORKDAYS(s, e, w) : '';
+      var a = s && !isNaN(n) ? ILADDWORKDAYS(s, n, w) : null;
+      $('add').innerHTML = a ? '<small>' + n + ' workdays after the start date</small>' + fd(a) : '';
+    };
+    [ws, we, wn, wk].forEach(function (x) { x.addEventListener('input', wr); x.addEventListener('change', wr); }); wr();
+  }
+
+  if (kind === 'age') {
+    var ab = $('b'), ay = $('y'); ay.value = new Date().getFullYear();
+    var ar = function () {
+      var b = pd(ab.value); if (!b) { $('out').innerHTML = ''; return; }
+      var hb = HEBBIRTHDAY(b, parseInt(ay.value, 10) || new Date().getFullYear());
+      $('out').innerHTML = '<small>Exact age today</small>' + AGEYMD(b) + '<br><small style="margin-top:10px">Hebrew birthday in ' + ay.value + '</small>' + (hb ? fd(hb) : '—') + '<br><small style="margin-top:10px">Hebrew birth date</small><span class="he">' + GREG2HEB(b, 'he') + '</span>';
+    };
+    ab.addEventListener('input', ar); ay.addEventListener('input', ar); ar();
   }
 
   if (kind === 'shekel') {
