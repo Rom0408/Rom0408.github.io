@@ -28,6 +28,7 @@
       var d = window.SYDeal(), on = d.on;
       document.body.classList.toggle('deal', on);
       document.querySelectorAll('.px').forEach(function (e) { e.innerHTML = on ? '<s>$15</s> $7.5' : '$15'; });
+      document.querySelectorAll('.plan-badge').forEach(function (e) { e.textContent = on ? 'BEST VALUE · SAVE $120' : 'BEST VALUE · SAVE $60 VS MONTHLY'; });
       m.innerHTML = on ? '<b>Weekend deal: 50% off every add-on, $7.5 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
     }
     tick(); setInterval(tick, 1000);
