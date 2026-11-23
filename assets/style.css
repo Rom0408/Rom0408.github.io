@@ -142,3 +142,5 @@ a.card .stage.mini+.tag{margin-top:0}
 .ribbon h2{color:#fff;margin:0 0 8px;font-size:clamp(24px,3.4vw,32px)}.ribbon p{margin:0;color:rgba(255,255,255,.78);max-width:460px}.ribbon .cta-row{margin:0}
 .btn.light{background:#fff;color:#0a2540;border-color:#fff}.btn.outline{background:transparent;color:#fff;border-color:rgba(255,255,255,.45)}.btn.outline:hover{border-color:#fff}
 @media(max-width:700px){.ribbon{padding:30px 24px}}
+
+.plan .was{font-size:20px;color:var(--muted);text-decoration:line-through;margin-top:8px}.plan .was small{font-size:14px}.plan .price{margin-top:0}.plan .save{color:var(--ok);font-weight:600;margin:4px 0 0}.plan .badge{white-space:nowrap}.paybox .was{font-size:20px;color:var(--muted);text-decoration:line-through}.paybox .save{color:var(--ok);font-weight:600;margin:0}
