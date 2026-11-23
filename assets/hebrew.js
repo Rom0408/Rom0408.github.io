@@ -427,3 +427,100 @@ function regexMatchRows_(values, pattern, flags) {
   return out;
 }
 if (typeof module !== 'undefined') module.exports = {};
+
+/** Israeli business helpers: ID/company check, amount in Hebrew words, VAT, IBAN. Offline. */
+function mapI_(x, fn) {
+  if (Array.isArray(x)) return x.map(function (r) { return Array.isArray(r) ? r.map(function (c) { return mapI_(c, fn); }) : mapI_(r, fn); });
+  return fn(x);
+}
+
+function idValid_(v) {
+  var s = String(v).replace(/\D/g, '');
+  if (!s || s.length > 9) return false;
+  while (s.length < 9) s = '0' + s;
+  if (/^0+$/.test(s)) return false;
+  var sum = 0;
+  for (var i = 0; i < 9; i++) { var n = +s.charAt(i) * (i % 2 === 0 ? 1 : 2); sum += n > 9 ? n - 9 : n; }
+  return sum % 10 === 0;
+}
+/** TRUE if a valid Israeli ID (teudat zehut) or company number (check digit). @customfunction */
+function ISRAELID(id) { return mapI_(id, idValid_); }
+
+/** Pad an Israeli ID to 9 digits. @customfunction */
+function PADID(id) { return mapI_(id, function (v) { var s = String(v).replace(/\D/g, ''); return s ? ('000000000' + s).slice(-9) : ''; }); }
+
+function ibanValid_(v) {
+  var s = String(v).replace(/\s+/g, '').toUpperCase();
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{10,30}$/.test(s)) return false;
+  var r = s.slice(4) + s.slice(0, 4), rem = 0;
+  var d = r.replace(/[A-Z]/g, function (c) { return c.charCodeAt(0) - 55; });
+  for (var i = 0; i < d.length; i++) rem = (rem * 10 + +d.charAt(i)) % 97;
+  return rem === 1;
+}
+/** TRUE if the IBAN checksum is valid. @customfunction */
+function ISIBAN(iban) { return mapI_(iban, ibanValid_); }
+
+/** Add VAT (default 18%). @customfunction */
+function VATADD(net, rate) { rate = rate === undefined || rate === '' ? 0.18 : rate; return mapI_(net, function (v) { return typeof v === 'number' ? Math.round(v * (1 + rate) * 100) / 100 : v; }); }
+/** Strip VAT from a gross amount (default 18%). @customfunction */
+function VATSTRIP(gross, rate) { rate = rate === undefined || rate === '' ? 0.18 : rate; return mapI_(gross, function (v) { return typeof v === 'number' ? Math.round(v / (1 + rate) * 100) / 100 : v; }); }
+/** VAT part of a gross amount. @customfunction */
+function VATPART(gross, rate) { rate = rate === undefined || rate === '' ? 0.18 : rate; return mapI_(gross, function (v) { return typeof v === 'number' ? Math.round((v - v / (1 + rate)) * 100) / 100 : v; }); }
+
+var HW_ONES = ['', 'אחד', 'שניים', 'שלושה', 'ארבעה', 'חמישה', 'שישה', 'שבעה', 'שמונה', 'תשעה'];
+var HW_ONES_F = ['', 'אחת', 'שתיים', 'שלוש', 'ארבע', 'חמש', 'שש', 'שבע', 'שמונה', 'תשע'];
+var HW_TENS = ['', 'עשרה', 'עשרים', 'שלושים', 'ארבעים', 'חמישים', 'שישים', 'שבעים', 'שמונים', 'תשעים'];
+var HW_TEENS_M = ['עשרה', 'אחד עשר', 'שנים עשר', 'שלושה עשר', 'ארבעה עשר', 'חמישה עשר', 'שישה עשר', 'שבעה עשר', 'שמונה עשר', 'תשעה עשר'];
+var HW_TEENS_F = ['עשר', 'אחת עשרה', 'שתים עשרה', 'שלוש עשרה', 'ארבע עשרה', 'חמש עשרה', 'שש עשרה', 'שבע עשרה', 'שמונה עשרה', 'תשע עשרה'];
+var HW_HUND = ['', 'מאה', 'מאתיים', 'שלוש מאות', 'ארבע מאות', 'חמש מאות', 'שש מאות', 'שבע מאות', 'שמונה מאות', 'תשע מאות'];
+
+function hw3_(n, fem) { // 1..999 -> list of word groups
+  var out = [], h = Math.floor(n / 100), r = n % 100;
+  if (h) out.push(HW_HUND[h]);
+  if (r >= 10 && r < 20) out.push((fem ? HW_TEENS_F : HW_TEENS_M)[r - 10]);
+  else {
+    if (r >= 20) out.push(HW_TENS[Math.floor(r / 10)]);
+    var o = r % 10; if (o) out.push((fem ? HW_ONES_F : HW_ONES)[o]);
+    if (r === 10) out.push(fem ? 'עשר' : 'עשרה');
+  }
+  return out;
+}
+
+function hebWords_(n, fem) {
+  n = Math.floor(Math.abs(n));
+  if (n === 0) return 'אפס';
+  if (n >= 1e9) return String(n);
+  var segs = [], mil = Math.floor(n / 1e6), th = Math.floor((n % 1e6) / 1000), rest = n % 1000;
+  function seg(words, suffix, one) { // one: words already complete
+    var w = words.slice(), inner = false;
+    if (!one && w.length > 1) { w[w.length - 1] = 'ו' + w[w.length - 1]; inner = true; }
+    segs.push({w: w.concat(suffix || []), inner: inner});
+  }
+  if (mil) { if (mil === 1) seg(['מיליון'], 0, true); else if (mil === 2) seg(['שני מיליון'], 0, true); else seg(hw3_(mil, false), ['מיליון']); }
+  if (th) {
+    var T = {4: 'ארבעת', 5: 'חמשת', 6: 'ששת', 7: 'שבעת', 8: 'שמונת', 9: 'תשעת', 10: 'עשרת', 3: 'שלושת'};
+    if (th === 1) seg(['אלף'], 0, true); else if (th === 2) seg(['אלפיים'], 0, true);
+    else if (th <= 10) seg([T[th] + ' אלפים'], 0, true);
+    else seg(hw3_(th, false), ['אלף']);
+  }
+  if (rest) seg(hw3_(rest, fem));
+  var last = segs[segs.length - 1];
+  if (segs.length > 1 && !last.inner) last.w[0] = 'ו' + last.w[0];
+  return segs.map(function (x) { return x.w.join(' '); }).join(' ');
+}
+/** Whole number in Hebrew words. fem=TRUE for feminine nouns. @customfunction */
+function HEBWORDS(n, fem) { return mapI_(n, function (v) { return typeof v === 'number' ? (v < 0 ? 'מינוס ' : '') + hebWords_(v, !!fem) : ''; }); }
+
+/** Shekel amount in Hebrew words, e.g. מאה ועשרים שקלים וחמישים אגורות. @customfunction */
+function SHEKELWORDS(amount) {
+  return mapI_(amount, function (v) {
+    if (typeof v !== 'number') return '';
+    var tot = Math.round(Math.abs(v) * 100), sh = Math.floor(tot / 100), ag = tot % 100, out;
+    out = sh === 1 ? 'שקל אחד' : sh === 2 ? 'שני שקלים' : hebWords_(sh, false) + ' שקלים';
+    if (ag) out += ' ו' + (ag === 1 ? 'אגורה אחת' : hebWords_(ag, true) + ' אגורות');
+    return (v < 0 ? 'מינוס ' : '') + out;
+  });
+}
+
+function invalidIdRows_(values, col) { var bad = []; values.forEach(function (r, i) { if (String(r[col]).trim() !== '' && !idValid_(r[col])) bad.push(i); }); return bad; }
+if (typeof module !== 'undefined') module.exports = {};

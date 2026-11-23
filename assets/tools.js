@@ -87,4 +87,19 @@
     };
     [rp, rr, rt].forEach(function (e) { e.addEventListener('input', rx); }); rx();
   }
+
+  if (kind === 'idcheck') {
+    var ii = $('i');
+    var ic = function () {
+      var L = ii.value.split('\n').filter(function (l) { return l.trim(); }), ok = 0;
+      $('out').textContent = L.map(function (l) { var v = idValid_(l); if (v) ok++; return (v ? '✅ ' : '❌ ') + l.trim(); }).join('\n') + '\n\n' + ok + ' of ' + L.length + ' valid';
+    };
+    ii.addEventListener('input', ic); ic();
+  }
+
+  if (kind === 'shekel') {
+    var nn = $('n');
+    var sc = function () { var v = parseFloat(nn.value); $('out').textContent = isNaN(v) ? '' : SHEKELWORDS(v); };
+    nn.addEventListener('input', sc); sc();
+  }
 })();
