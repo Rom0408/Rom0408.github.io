@@ -145,3 +145,8 @@ a.card .stage.mini+.tag{margin-top:0}
 
 .plan .was{font-size:20px;color:var(--muted);text-decoration:line-through;margin-top:8px}.plan .was small{font-size:14px}.plan .price{margin-top:0}.plan .save{color:var(--ok);font-weight:600;margin:4px 0 0}.plan .badge{white-space:nowrap}.paybox .was{font-size:20px;color:var(--muted);text-decoration:line-through}.paybox .save{color:var(--ok);font-weight:600;margin:0}
 .announce,body.deal .announce{background:var(--alt);color:var(--ink);border-bottom:1px solid var(--line)}.announce a{color:var(--brand-ink)}.announce b{font-weight:600}.announce .tm{background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:1px 7px}
+:root{--cg:linear-gradient(135deg,#e0f2ff,#d4f5ec 55%,#fff3d2)}[data-theme=dark]{--cg:linear-gradient(135deg,#17284d,#2a1f4d 55%,#40203a)}
+.announce,body.deal .announce{background:var(--cg);border-bottom:1px solid var(--line);font-weight:500}.announce .tm{background:rgba(255,255,255,.55);border-color:rgba(10,37,64,.15)}[data-theme=dark] .announce .tm{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2)}
+.ribbon{background:var(--cg);color:var(--ink);border:1px solid var(--line)}.ribbon h2{color:var(--ink)}.ribbon p{color:var(--muted)}
+.ribbon .btn.light{background:var(--brand);color:#fff;border-color:var(--brand)}.ribbon .btn.outline{color:var(--ink);border-color:rgba(10,37,64,.3)}.ribbon .btn.outline:hover{border-color:var(--ink)}
+[data-theme=dark] .ribbon .btn.light{background:#fff;color:#0a2540;border-color:#fff}[data-theme=dark] .ribbon .btn.outline{color:#fff;border-color:rgba(255,255,255,.45)}[data-theme=dark] .ribbon p{color:rgba(255,255,255,.78)}[data-theme=dark] .ribbon h2{color:#fff}
