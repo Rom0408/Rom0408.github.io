@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Checkout | Spark Yard Labs</title></head>
+<body style="font-family:system-ui,sans-serif;max-width:480px;margin:4rem auto;padding:0 1rem">
+<h1>Checkout</h1>
+<p id="msg">Loading secure checkout…</p>
+<p><a href="/">Back to Spark Yard Labs</a> · Support: sparkyardlabs@gmail.com</p>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script>
+// Sandbox now; switch environment + token to live at launch.
+Paddle.Environment.set("sandbox");
+Paddle.Initialize({ token: "CLIENT_TOKEN_HERE" });
+// Paddle.js opens checkout automatically when the URL has ?_ptxn=txn_...
+if (!new URLSearchParams(location.search).get("_ptxn")) {
+  document.getElementById("msg").textContent = "No transaction found. Start from the pricing page.";
+}
+</script>
+</body></html>
