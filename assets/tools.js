@@ -18,7 +18,7 @@
     f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
     var dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday), sod = (+o.hour % 24) * 3600 + +o.minute * 60 + +o.second;
     var on = dow < 2, days = on ? 2 - dow : (7 - dow) % 7 || 7;
-    return {on: on, secs: days * 86400 - sod, price: '$7.50'};
+    return {on: on, secs: days * 86400 - sod, price: '$7.5'};
   };
   (function () {
     var m = $('annmsg'); if (!m) return;
@@ -27,10 +27,23 @@
     function tick() {
       var d = window.SYDeal(), on = d.on;
       document.body.classList.toggle('deal', on);
-      document.querySelectorAll('.px').forEach(function (e) { e.innerHTML = on ? '<s>$15</s> $7.50' : '$15'; });
-      m.innerHTML = on ? '<b>Weekend deal: 50% off every add-on, $7.50 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
+      document.querySelectorAll('.px').forEach(function (e) { e.innerHTML = on ? '<s>$15</s> $7.5' : '$15'; });
+      m.innerHTML = on ? '<b>Weekend deal: 50% off every add-on, $7.5 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
     }
     tick(); setInterval(tick, 1000);
+  })();
+  (function () {
+    var c = $('car'); if (!c) return;
+    var tr = c.querySelector('.car-track'), ds = c.querySelectorAll('.car-dots button'), n = ds.length, i = 0, hold = false, t;
+    function go(k) { i = (k + n) % n; tr.scrollTo({left: i * tr.clientWidth, behavior: 'smooth'}); }
+    function mark() { var k = Math.round(tr.scrollLeft / tr.clientWidth); i = k; ds.forEach(function (d, j) { d.classList.toggle('on', j === k); }); }
+    tr.addEventListener('scroll', function () { clearTimeout(t); t = setTimeout(mark, 60); });
+    ds.forEach(function (d, j) { d.addEventListener('click', function () { go(j); }); });
+    c.querySelector('.car-prev').addEventListener('click', function () { go(i - 1); });
+    c.querySelector('.car-next').addEventListener('click', function () { go(i + 1); });
+    ['mouseenter', 'focusin', 'touchstart'].forEach(function (e) { c.addEventListener(e, function () { hold = true; }, {passive: true}); });
+    ['mouseleave', 'focusout'].forEach(function (e) { c.addEventListener(e, function () { hold = false; }); });
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(function () { if (!hold) go(i + 1); }, 4500);
   })();
   var menu = document.querySelector('.menu-btn');
   if (menu) menu.addEventListener('click', function () { document.querySelector('nav.main').classList.toggle('open'); });
