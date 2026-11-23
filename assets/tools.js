@@ -12,12 +12,12 @@
     try { localStorage.setItem('theme', nx); } catch (e) {}
   });
 
-  /* Weekly deal: Sunday + Monday (Asia/Jerusalem), 50% off $15. Countdown in announce bar. */
+  /* Weekly deal: Friday to Sunday (Asia/Jerusalem), 50% off $15. Countdown in announce bar. */
   window.SYDeal = function () {
     var f = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', weekday: 'short', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false}), o = {};
     f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
     var dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday), sod = (+o.hour % 24) * 3600 + +o.minute * 60 + +o.second;
-    var on = dow < 2, days = on ? 2 - dow : (7 - dow) % 7 || 7;
+    var on = dow === 5 || dow === 6 || dow === 0, days = on ? (dow === 0 ? 1 : 7 - dow + 1) : 5 - dow;
     return {on: on, secs: days * 86400 - sod, price: '$7.5'};
   };
   (function () {
