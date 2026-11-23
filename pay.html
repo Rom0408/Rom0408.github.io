@@ -10,9 +10,12 @@
 // Sandbox now; switch environment + token to live at launch.
 Paddle.Environment.set("sandbox");
 Paddle.Initialize({ token: "test_8a9ce85db6e6dd09f66a888365f" });
-// Paddle.js opens checkout automatically when the URL has ?_ptxn=txn_...
+// With ?_ptxn=... Paddle.js opens that transaction. Otherwise open checkout for the Pro price.
+var PRO_PRICE = "pri_01m846vkzaqjbsdnnymamb6h93"; // sandbox price; swap for live at launch
+function buy() { Paddle.Checkout.open({ items: [{ priceId: PRO_PRICE, quantity: 1 }] }); }
 if (!new URLSearchParams(location.search).get("_ptxn")) {
-  document.getElementById("msg").textContent = "No transaction found. Start from the pricing page.";
+  document.getElementById("msg").innerHTML = '<button onclick="buy()" style="font-size:1rem;padding:.6rem 1.2rem">Buy Pro, $19/year</button>';
+  buy();
 }
 </script>
 </body></html>
