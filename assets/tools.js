@@ -5,6 +5,12 @@
   function copy(text) { (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { toast('Copied'); }, function () { toast('Copy failed'); }); }
   window.copyFrom = function (id) { var e = $(id); copy(e.value !== undefined ? e.value : e.textContent); };
 
+  var tb = $('theme');
+  if (tb) tb.addEventListener('click', function () {
+    var d = document.documentElement, dark = d.getAttribute('data-theme') === 'dark';
+    if (dark) d.removeAttribute('data-theme'); else d.setAttribute('data-theme', 'dark');
+    try { localStorage.setItem('theme', dark ? 'light' : 'dark'); } catch (e) {}
+  });
   var menu = document.querySelector('.menu-btn');
   if (menu) menu.addEventListener('click', function () { document.querySelector('nav.main').classList.toggle('open'); });
 
