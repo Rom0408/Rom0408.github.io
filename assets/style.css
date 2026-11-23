@@ -29,10 +29,10 @@ main{max-width:1160px;margin:0 auto;border-left:1px solid var(--line);border-rig
 @media(max-width:1200px){main{border:0}}
 .hero{position:relative;overflow:hidden;padding:96px 0 84px;border-bottom:1px solid var(--line)}
 .hero .wrap{position:relative;z-index:1}
-.hero:after{content:"";position:absolute;right:-8%;top:-30%;width:52%;height:170%;transform:rotate(18deg);z-index:0;opacity:.9;
- background:linear-gradient(100deg,transparent 0,#8be9d8 18%,#6aa8ff 38%,#a78bfa 55%,#ff8fb1 72%,#ffc46b 90%,transparent 100%);filter:blur(1px);
- -webkit-mask-image:linear-gradient(90deg,transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(90deg,transparent,#000 30%,#000 70%,transparent)}
-@media(max-width:800px){.hero:after{opacity:.35}}
+.hero:after{content:"";position:absolute;right:2%;top:-40%;width:34%;height:190%;transform:rotate(24deg);z-index:0;opacity:.55;border-radius:50% 50% 50% 50%/8% 8% 8% 8%;
+ background:linear-gradient(180deg,#8be9d8,#6aa8ff 35%,#a78bfa 60%,#ff8fb1 85%,#ffc46b);filter:blur(38px)}
+@media(prefers-color-scheme:dark){.hero:after{opacity:.35}}
+@media(max-width:800px){.hero:after{opacity:.25}}
 .hero h1,.hero p.lead{max-width:640px}
 .hero p.lead{font-size:clamp(17px,2vw,20px);color:var(--muted);margin:0 0 28px}
 .pill{display:inline-block;color:var(--brand-ink);font-weight:600;font-size:14px;margin-bottom:18px}
