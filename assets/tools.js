@@ -12,13 +12,13 @@
     try { localStorage.setItem('theme', nx); } catch (e) {}
   });
 
-  /* Weekly deal: Sunday + Monday (Asia/Jerusalem), 30% off $15. Countdown in announce bar. */
+  /* Weekly deal: Sunday + Monday (Asia/Jerusalem), 50% off $15. Countdown in announce bar. */
   window.SYDeal = function () {
     var f = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', weekday: 'short', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false}), o = {};
     f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
     var dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday), sod = (+o.hour % 24) * 3600 + +o.minute * 60 + +o.second;
     var on = dow < 2, days = on ? 2 - dow : (7 - dow) % 7 || 7;
-    return {on: on, secs: days * 86400 - sod, price: '$10.50'};
+    return {on: on, secs: days * 86400 - sod, price: '$7.50'};
   };
   (function () {
     var m = $('annmsg'); if (!m) return;
@@ -27,8 +27,8 @@
     function tick() {
       var d = window.SYDeal(), on = d.on;
       document.body.classList.toggle('deal', on);
-      document.querySelectorAll('.px').forEach(function (e) { e.innerHTML = on ? '<s>$15</s> $10.50' : '$15'; });
-      m.innerHTML = on ? '<b>Weekend deal: 30% off every add-on, $10.50 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base + ' Next 30%-off deal (Sun &amp; Mon) in <span class="tm">' + fmt(d.secs) + '</span>.';
+      document.querySelectorAll('.px').forEach(function (e) { e.innerHTML = on ? '<s>$15</s> $7.50' : '$15'; });
+      m.innerHTML = on ? '<b>Weekend deal: 50% off every add-on, $7.50 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
     }
     tick(); setInterval(tick, 1000);
   })();
