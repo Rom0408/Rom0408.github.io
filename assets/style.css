@@ -155,3 +155,4 @@ a.card .stage.mini+.tag{margin-top:0}
 .plan-fab{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:99px;background:var(--brand);color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 10px 30px -8px rgba(10,37,64,.5);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 .plan-fab.show{opacity:1;pointer-events:auto}.plan-fab span{display:inline-block;animation:fabb 1.4s ease-in-out infinite}@keyframes fabb{50%{transform:translateY(3px)}}
 @media(max-width:520px){.plan-fab{font-size:14px;padding:10px 16px;white-space:nowrap}}
+#tools,#buy,#plans{scroll-margin-top:96px}
