@@ -179,3 +179,7 @@
     nn.addEventListener('input', sc); sc();
   }
 })();
+
+(function(){var f=document.getElementById('planfab'),p=document.getElementById('plans');if(!f||!p)return;
+function u(){var r=p.getBoundingClientRect();f.classList.toggle('show',window.scrollY>60&&r.top>window.innerHeight*0.6)}
+addEventListener('scroll',u,{passive:true});addEventListener('resize',u);u()})();
