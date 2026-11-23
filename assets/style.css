@@ -150,3 +150,4 @@ a.card .stage.mini+.tag{margin-top:0}
 .ribbon{background:var(--cg);color:var(--ink);border:1px solid var(--line)}.ribbon h2{color:var(--ink)}.ribbon p{color:var(--muted)}
 .ribbon .btn.light{background:var(--brand);color:#fff;border-color:var(--brand)}.ribbon .btn.outline{color:var(--ink);border-color:rgba(10,37,64,.3)}.ribbon .btn.outline:hover{border-color:var(--ink)}
 [data-theme=dark] .ribbon .btn.light{background:#fff;color:#0a2540;border-color:#fff}[data-theme=dark] .ribbon .btn.outline{color:#fff;border-color:rgba(255,255,255,.45)}[data-theme=dark] .ribbon p{color:rgba(255,255,255,.78)}[data-theme=dark] .ribbon h2{color:#fff}
+.stk{position:sticky;top:0;z-index:30}header.site{position:static}.ribbon h2{font-weight:700}.was-i{opacity:.55;font-weight:400}
