@@ -65,4 +65,26 @@
     document.querySelectorAll('.opts input,.opts select,#i').forEach(function (e) { e.addEventListener('input', run2); e.addEventListener('change', run2); });
     run2();
   }
+
+  if (kind === 'listcompare') {
+    var la = $('a'), lb = $('b');
+    var lines = function (e) { return e.value.split('\n').map(function (l) { return [l]; }).filter(function (r) { return r[0].trim() !== ''; }); };
+    var lc = function () {
+      var A = lines(la), B = lines(lb);
+      $('oa').value = missingRows_(A, B, 0, 0).map(function (r) { return r[0]; }).join('\n');
+      $('ob').value = missingRows_(B, A, 0, 0).map(function (r) { return r[0]; }).join('\n');
+      $('oc').value = commonRows_(A, B, 0, 0).map(function (r) { return r[0]; }).join('\n');
+    };
+    la.addEventListener('input', lc); lb.addEventListener('input', lc); lc();
+  }
+
+  if (kind === 'regex') {
+    var rp = $('p'), rr = $('r'), rt = $('t');
+    var rx = function () {
+      var m = null; try { m = rt.value.match(new RegExp(rp.value, 'g')); } catch (e) { $('out').innerHTML = '<small>Invalid pattern</small>'; $('rep').value = ''; return; }
+      $('out').innerHTML = '<small>' + (m ? m.length : 0) + ' matches</small>' + (m ? m.map(function (x) { return '<code>' + x.replace(/</g, '&lt;') + '</code> '; }).join('') : '—');
+      $('rep').value = rp.value ? rt.value.replace(new RegExp(rp.value, 'g'), rr.value) : '';
+    };
+    [rp, rr, rt].forEach(function (e) { e.addEventListener('input', rx); }); rx();
+  }
 })();

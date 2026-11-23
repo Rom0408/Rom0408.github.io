@@ -263,3 +263,167 @@ function sortRows_(values, col, desc) {
 }
 
 if (typeof module !== 'undefined') module.exports = {cleanValues_: cleanValues_, dedupeRows_: dedupeRows_, removeEmptyRows_: removeEmptyRows_, caseValues_: caseValues_, fillDown_: fillDown_, splitValues_: splitValues_, sortRows_: sortRows_};
+
+/** Pure compare/merge helpers on 2D arrays. */
+function key_(c) { return String(c === null || c === undefined ? '' : c).trim().toLowerCase(); }
+
+/** Rows of A whose key column value is missing from B's key column. */
+function missingRows_(a, b, ka, kb) {
+  var set = {}; b.forEach(function (r) { set[key_(r[kb])] = 1; });
+  return a.filter(function (r) { return key_(r[ka]) !== '' && !set[key_(r[ka])]; });
+}
+
+/** Rows of A whose key also exists in B. */
+function commonRows_(a, b, ka, kb) {
+  var set = {}; b.forEach(function (r) { set[key_(r[kb])] = 1; });
+  return a.filter(function (r) { return key_(r[ka]) !== '' && set[key_(r[ka])]; });
+}
+
+/** Left join: append B's other columns to A rows matched on key. width = B column count. */
+function leftJoin_(a, b, ka, kb) {
+  var map = {}, w = b.length ? b[0].length : 0;
+  b.forEach(function (r) { var k = key_(r[kb]); if (!(k in map)) map[k] = r; });
+  return a.map(function (r) {
+    var m = map[key_(r[ka])], extra = [];
+    for (var j = 0; j < w; j++) if (j !== kb) extra.push(m ? m[j] : '');
+    return r.concat(extra);
+  });
+}
+
+/** Cell-by-cell diff of same-shaped ranges: list of {row, col, a, b} (1-based). */
+function diffCells_(a, b) {
+  var out = [], R = Math.max(a.length, b.length);
+  for (var i = 0; i < R; i++) {
+    var C = Math.max((a[i] || []).length, (b[i] || []).length);
+    for (var j = 0; j < C; j++) {
+      var x = a[i] && a[i][j] !== undefined ? a[i][j] : '', y = b[i] && b[i][j] !== undefined ? b[i][j] : '';
+      if (String(x) !== String(y)) out.push({row: i + 1, col: j + 1, a: x, b: y});
+    }
+  }
+  return out;
+}
+
+/** Stack ranges vertically, padding short rows. */
+function stack_(list) {
+  var w = 0; list.forEach(function (v) { v.forEach(function (r) { if (r.length > w) w = r.length; }); });
+  var out = []; list.forEach(function (v) { v.forEach(function (r) { var c = r.slice(); while (c.length < w) c.push(''); out.push(c); }); });
+  return out;
+}
+
+/** Levenshtein distance. */
+function lev_(a, b) {
+  a = String(a); b = String(b);
+  var p = [], i, j;
+  for (j = 0; j <= b.length; j++) p[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    var prev = p[0]; p[0] = i;
+    for (j = 1; j <= b.length; j++) {
+      var t = p[j];
+      p[j] = Math.min(p[j] + 1, p[j - 1] + 1, prev + (a.charAt(i - 1) === b.charAt(j - 1) ? 0 : 1));
+      prev = t;
+    }
+  }
+  return p[b.length];
+}
+
+/** Similarity 0..1 between two strings (case-insensitive). @customfunction */
+function SIMILARITY(a, b) {
+  a = String(a).toLowerCase().trim(); b = String(b).toLowerCase().trim();
+  var m = Math.max(a.length, b.length);
+  return m === 0 ? 1 : Math.round((1 - lev_(a, b) / m) * 1000) / 1000;
+}
+
+/** Best fuzzy match of text within a list (column). Returns the match, or empty under min similarity. @customfunction */
+function FUZZYMATCH(text, list, min) {
+  min = min === undefined || min === '' ? 0.7 : min;
+  var flat = [].concat.apply([], Array.isArray(list) ? list : [[list]]), best = '', bs = -1;
+  flat.forEach(function (c) { if (c === '') return; var s = SIMILARITY(text, c); if (s > bs) { bs = s; best = c; } });
+  return bs >= min ? best : '';
+}
+
+/** Groups of near-duplicate values in column 0: [[indexes...]] with similarity >= min. */
+function fuzzyGroups_(values, min) {
+  var n = values.length, used = {}, groups = [];
+  for (var i = 0; i < n; i++) {
+    if (used[i] || key_(values[i][0]) === '') continue;
+    var g = [i];
+    for (var j = i + 1; j < n; j++) if (!used[j] && SIMILARITY(values[i][0], values[j][0]) >= min) { g.push(j); used[j] = 1; }
+    if (g.length > 1) { used[i] = 1; groups.push(g); }
+  }
+  return groups;
+}
+
+if (typeof module !== 'undefined') module.exports = {};
+
+/** Regex & text-extraction pack. Pure functions + custom functions. Offline. */
+function mapC_(x, fn) {
+  if (Array.isArray(x)) return x.map(function (r) { return Array.isArray(r) ? r.map(function (c) { return mapC_(c, fn); }) : mapC_(r, fn); });
+  return fn(x);
+}
+function re_(p, flags) { try { return new RegExp(p, flags || 'g'); } catch (e) { return null; } }
+
+/** All regex matches joined by a delimiter (default ", "). @customfunction */
+function REGEXALL(text, pattern, delim) {
+  var r = re_(pattern, 'g'); if (!r) return '#BAD PATTERN';
+  return mapC_(text, function (v) { var m = String(v).match(r); return m ? m.join(delim === undefined ? ', ' : delim) : ''; });
+}
+
+/** Nth regex match (1-based, default 1), or empty. @customfunction */
+function REGEXNTH(text, pattern, n) {
+  var r = re_(pattern, 'g'); if (!r) return '#BAD PATTERN';
+  n = n || 1;
+  return mapC_(text, function (v) { var m = String(v).match(r); return m && m[n - 1] !== undefined ? m[n - 1] : ''; });
+}
+
+/** Count of regex matches. @customfunction */
+function REGEXCOUNT(text, pattern) {
+  var r = re_(pattern, 'g'); if (!r) return '#BAD PATTERN';
+  return mapC_(text, function (v) { var m = String(v).match(r); return m ? m.length : 0; });
+}
+
+/** Regex replace with $1-style groups. @customfunction */
+function REGEXSWAP(text, pattern, repl) {
+  var r = re_(pattern, 'g'); if (!r) return '#BAD PATTERN';
+  return mapC_(text, function (v) { return String(v).replace(r, repl === undefined ? '' : repl); });
+}
+
+/** All numbers in text, joined (default ", "). @customfunction */
+function EXTRACTNUMBERS(text, delim) { return REGEXALL(text, '-?\\d+(?:[.,]\\d+)?', delim); }
+
+/** Text between two markers (first occurrence). @customfunction */
+function BETWEEN(text, start, end) {
+  return mapC_(text, function (v) {
+    var s = String(v), i = s.indexOf(start); if (i < 0) return '';
+    i += String(start).length; var j = end === undefined || end === '' ? s.length : s.indexOf(end, i);
+    return j < 0 ? '' : s.slice(i, j);
+  });
+}
+
+/** Hashtags / @mentions in text. @customfunction */
+function EXTRACTTAGS(text, delim) { return REGEXALL(text, '[#@][\\w\\u05d0-\\u05ea]+', delim); }
+
+/** Word count (Hebrew-safe). @customfunction */
+function WORDCOUNT(text) { return mapC_(text, function (v) { var s = String(v).trim(); return s ? s.split(/\s+/).length : 0; }); }
+
+/** Reverse text. @customfunction */
+function REVERSETEXT(text) { return mapC_(text, function (v) { return Array.from(String(v)).reverse().join(''); }); }
+
+/** Selection helper: replace by regex across a 2D range. Returns {values, changed}. */
+function regexReplaceRange_(values, pattern, repl, flags) {
+  var r = re_(pattern, flags || 'g'); if (!r) return null;
+  var changed = 0;
+  var out = values.map(function (row) { return row.map(function (c) {
+    if (typeof c !== 'string') return c;
+    var n = c.replace(r, repl); if (n !== c) changed++; return n;
+  }); });
+  return {values: out, changed: changed};
+}
+
+/** Rows (indexes) where any cell matches. */
+function regexMatchRows_(values, pattern, flags) {
+  var r = re_(pattern, flags || 'i'); if (!r) return null;
+  var out = [];
+  values.forEach(function (row, i) { if (row.some(function (c) { r.lastIndex = 0; return r.test(String(c)); })) out.push(i); });
+  return out;
+}
+if (typeof module !== 'undefined') module.exports = {};
