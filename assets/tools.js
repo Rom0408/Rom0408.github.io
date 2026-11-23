@@ -46,6 +46,11 @@
     ['mouseleave', 'focusout'].forEach(function (e) { c.addEventListener(e, function () { hold = false; }); });
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(function () { if (!hold) go(i + 1); }, 4500);
   })();
+  (function () {
+    var f = $('planfab'), p = $('plans'), b = $('buy'); if (!f || !p) return;
+    function chk() { var pr = p.getBoundingClientRect(), br = b.getBoundingClientRect(), vh = window.innerHeight; f.classList.toggle('show', br.top < vh * .6 && pr.top > vh * .5); }
+    window.addEventListener('scroll', chk, {passive: true}); chk();
+  })();
   var menu = document.querySelector('.menu-btn');
   if (menu) menu.addEventListener('click', function () { document.querySelector('nav.main').classList.toggle('open'); });
 

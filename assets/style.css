@@ -151,3 +151,6 @@ a.card .stage.mini+.tag{margin-top:0}
 .ribbon .btn.light{background:var(--brand);color:#fff;border-color:var(--brand)}.ribbon .btn.outline{color:var(--ink);border-color:rgba(10,37,64,.3)}.ribbon .btn.outline:hover{border-color:var(--ink)}
 [data-theme=dark] .ribbon .btn.light{background:#fff;color:#0a2540;border-color:#fff}[data-theme=dark] .ribbon .btn.outline{color:#fff;border-color:rgba(255,255,255,.45)}[data-theme=dark] .ribbon p{color:rgba(255,255,255,.78)}[data-theme=dark] .ribbon h2{color:#fff}
 .stk{position:sticky;top:0;z-index:30}header.site{position:static}.ribbon h2{font-weight:700}.was-i{opacity:.55;font-weight:400}
+[data-theme=dark] .stage{background:var(--gd,linear-gradient(135deg,#17284d,#2a1f4d 55%,#40203a))}
+.plan-fab{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:40;display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:99px;background:var(--brand);color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 10px 30px -8px rgba(10,37,64,.5);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+.plan-fab.show{opacity:1;pointer-events:auto}.plan-fab span{display:inline-block;animation:fabb 1.4s ease-in-out infinite}@keyframes fabb{50%{transform:translateY(3px)}}
