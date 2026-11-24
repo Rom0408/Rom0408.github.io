@@ -192,3 +192,22 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   .hero{padding:56px 0 52px}section.block,.srow{padding:48px 0}
   .ribbon{padding:26px 20px}.price{font-size:44px}
 }
+
+/* consent banner, email capture, upsell, sticky buy bar */
+.consent{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;max-width:640px;margin:0 auto;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:0 12px 32px -10px rgba(10,37,64,.35);font-size:14px}
+.consent p{margin:0;flex:1 1 260px}.consent div{display:flex;gap:8px}
+.capture{background:var(--alt);border:1px solid var(--line);border-radius:8px;padding:22px;margin-top:28px;position:relative}
+.capture h3{margin-bottom:6px}.capture .cap-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.capture input[type=email]{flex:1 1 220px;min-width:0;font:inherit;color:var(--ink);background:var(--surface);border:1px solid #c9d2ea;border-radius:6px;padding:10px 12px;min-height:44px}
+.capture .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.capture .small-note{margin:8px 0 0}.capture .cap-msg:empty{display:none}
+.upsell{margin-top:28px}.upsell p{margin-bottom:.7em}
+.refund-note{font-size:13px;color:var(--muted);margin:10px 0 0}
+.buybar{display:none}
+@media(max-width:700px){
+  .buybar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:45;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -8px 24px -12px rgba(10,37,64,.3)}
+  .buybar-p{display:flex;flex-direction:column;line-height:1.25;font-size:14px}.buybar-p b{font-size:18px}.buybar-p small{color:var(--muted);font-size:12px}
+  body.has-buybar{padding-bottom:76px}
+  body.has-buybar .consent{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+}

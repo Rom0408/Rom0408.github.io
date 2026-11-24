@@ -12,7 +12,7 @@
     try { localStorage.setItem('theme', nx); } catch (e) {}
   });
 
-  /* Weekly deal: Friday to Sunday (Asia/Jerusalem), 50% off $15. Countdown in announce bar. */
+  /* Weekly deal, recurs every Friday to Sunday (Asia/Jerusalem): 50% off a $15 add-on. Countdown in announce bar. */
   window.SYDeal = function () {
     var f = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', weekday: 'short', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false}), o = {};
     f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
@@ -28,8 +28,7 @@
       var d = window.SYDeal(), on = d.on;
       document.body.classList.toggle('deal', on);
       document.querySelectorAll('.px').forEach(function (e) { e.innerHTML = on ? '<s>$15</s> $7.5' : '$15'; });
-      document.querySelectorAll('.plan-badge').forEach(function (e) { e.textContent = on ? 'BEST VALUE · SAVE $120' : 'BEST VALUE · SAVE $240 VS MONTHLY'; });
-      m.innerHTML = on ? '<b>Weekend deal: 50% off every add-on, $7.5 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
+      m.innerHTML = on ? '<b>Weekend deal, every Fri-Sun: 50% off every add-on, $7.5 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
     }
     tick(); setInterval(tick, 1000);
   })();
