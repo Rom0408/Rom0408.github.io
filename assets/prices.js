@@ -10,6 +10,11 @@
   P.allYearly = P.allYearlyList * f;
   P.allYearlyPerMonth = P.allYearly / 12;
   P.allYearlySave = P.allMonthly * 12 - P.allYearly;
+  /* APPROXIMATE USD->ILS rate, for display only ("approx." is always shown). Checkout is charged in the currency Paddle shows. Update this by hand when the rate drifts. */
+  P.ILS_RATE = 3.6;
+  var tz = ''; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) {}
+  P.isIL = /^he/i.test(navigator.language || '') || tz === 'Asia/Jerusalem';
+  P.num = {addon: P.addon, allMonthly: P.allMonthly, allYearly: P.allYearly, allMonthlyList: P.allMonthlyList, allYearlyList: P.allYearlyList, allYearlyPerMonth: P.allYearlyPerMonth, allYearlySave: P.allYearlySave};
   function usd(n) { return '$' + (Math.round(n * 100) / 100); }
   var M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], d = new Date(P.launchEnd + 'T00:00:00Z');
   P.fmt = {
@@ -22,6 +27,11 @@
   P.fill = function (root) {
     (root || document).querySelectorAll('[data-price]').forEach(function (e) {
       var v = P.fmt[e.getAttribute('data-price')]; if (v !== undefined) e.textContent = v;
+    });
+    (root || document).querySelectorAll('[data-ils]').forEach(function (e) {
+      var n = P.num[e.getAttribute('data-ils')];
+      if (n === undefined || !P.isIL) { e.hidden = true; return; }
+      e.textContent = '≈ ₪' + Math.round(n * P.ILS_RATE) + ' (approx.)'; e.hidden = false;
     });
     (root || document).querySelectorAll('[data-launch]').forEach(function (e) { e.hidden = !P.launchActive; });
   };

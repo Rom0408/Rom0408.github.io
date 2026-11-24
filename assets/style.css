@@ -211,3 +211,18 @@ select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),
   body.has-buybar{padding-bottom:76px}
   body.has-buybar .consent{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 }
+
+/* Before / After block on product pages */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:16px}.ba-col{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--surface)}
+.ba-col h3{margin:0 0 10px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.ba-after{border-color:var(--brand)}.ba-after h3{color:var(--brand)}
+.ba table{width:100%;border-collapse:collapse}.ba td{padding:7px 0;border-top:1px solid var(--line);font-size:15px;word-break:break-word}.ba tr:first-child td{border-top:0}.ba code{font-size:13px}
+.social-proof{margin:16px 0 0;text-align:center;font-weight:600}.social-proof[hidden]{display:none}
+@media(max-width:700px){.ba{grid-template-columns:1fr}}
+/* Home hero with free-tool cards */
+.hero-tools{max-width:980px}.hero-tools .card{display:block}
+.ba-sec{padding:36px 0}
+/* Pricing: billing toggle */
+.bill-toggle{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.bill-toggle button{border:0;background:transparent;color:var(--ink);font:inherit;font-weight:600;padding:8px 18px;border-radius:999px;cursor:pointer}
+.bill-toggle button[aria-pressed=true]{background:var(--brand);color:#fff}
+.ils{font-size:14px;color:var(--muted);margin:4px 0 0}
