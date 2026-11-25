@@ -1,5 +1,5 @@
 /* Renders email-capture forms ([data-capture]) and tool upsell blocks ([data-upsell]).
-   Only Sheets Toolkit is on sale; every other product is "coming soon" and gets a notify-me signup instead. */
+   Nothing is on sale right now; every product is "coming soon" and gets a notify-me signup instead. */
 (function () {
   var C = window.SYConfig || {}, P = window.SYPrices;
   var PRODUCTS = {
@@ -13,7 +13,7 @@
     'sheet-audit': ['Sheet Audit', '/products/sheet-audit.html'],
     'sheets-toolkit': ['Sheets Cleanup & Hebrew Toolkit', '/sheets-toolkit.html']
   };
-  var ON_SALE = {'sheets-toolkit': 1};
+  var ON_SALE = {};
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
   function track(n, p) { if (window.SY && SY.track) SY.track(n, p); }
 

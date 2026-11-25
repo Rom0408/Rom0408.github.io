@@ -17,7 +17,7 @@
     var f = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', weekday: 'short', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false}), o = {};
     f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
     var dow = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(o.weekday), sod = (+o.hour % 24) * 3600 + +o.minute * 60 + +o.second;
-    var on = dow === 5 || dow === 6 || dow === 0, days = on ? (dow === 0 ? 1 : 7 - dow + 1) : 5 - dow;
+    var on = false /* deal paused: nothing is on sale (was Fri-Sun) */, days = on ? (dow === 0 ? 1 : 7 - dow + 1) : 5 - dow;
     return {on: on, secs: days * 86400 - sod, price: '$7.5'};
   };
   (function () {
