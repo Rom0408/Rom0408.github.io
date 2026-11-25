@@ -1,4 +1,4 @@
-/* Browser glue for the free tools. Uses globals from hebrew.js (same code as the Sheets add-on). */
+/* Browser glue for the free tools. Uses globals from hebrew.js (browser versions of the helpers). */
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   function toast(t) { var e = $('toast'); if (!e) return; e.textContent = t; e.classList.add('show'); setTimeout(function () { e.classList.remove('show'); }, 1400); }
@@ -12,7 +12,7 @@
     try { localStorage.setItem('theme', nx); } catch (e) {}
   });
 
-  /* Weekly deal, recurs every Friday to Sunday (Asia/Jerusalem): 50% off a $15 add-on. Countdown in announce bar. */
+  /* Weekly deal, recurs every Friday to Sunday (Asia/Jerusalem): 50% off Sheets Cleanup & Hebrew Toolkit (code WEEKEND50, the only add-on on sale). Countdown in announce bar. */
   window.SYDeal = function () {
     var f = new Intl.DateTimeFormat('en-US', {timeZone: 'Asia/Jerusalem', weekday: 'short', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false}), o = {};
     f.formatToParts(new Date()).forEach(function (p) { o[p.type] = p.value; });
@@ -23,12 +23,12 @@
   (function () {
     var m = $('annmsg'); if (!m) return;
     function fmt(s) { var d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), mi = Math.floor(s % 3600 / 60), se = s % 60, z = function (x) { return ('0' + x).slice(-2); }; return (d ? d + 'd ' : '') + z(h) + ':' + z(mi) + ':' + z(se); }
-    var base = m.textContent;
+    var base = m.innerHTML;
     function tick() {
       var d = window.SYDeal(), on = d.on;
       document.body.classList.toggle('deal', on);
       document.querySelectorAll('.px').forEach(function (e) { e.innerHTML = on ? '<s>$15</s> $7.5' : '$15'; });
-      m.innerHTML = on ? '<b>Weekend deal, every Fri-Sun: 50% off every add-on, $7.5 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
+      m.innerHTML = on ? '<b>Weekend deal, every Fri-Sun: 50% off Sheets Cleanup &amp; Hebrew Toolkit, $7.5 instead of $15.</b> Ends in <span class="tm">' + fmt(d.secs) + '</span>.' : base;
     }
     tick(); setInterval(tick, 1000);
   })();

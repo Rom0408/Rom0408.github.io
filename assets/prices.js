@@ -38,9 +38,9 @@
   window.SYPrices = P;
   function init() {
     P.fill(document);
-    /* Sticky mobile buy bar on product pages (CSS shows it at <=700px only) */
+    /* Sticky mobile buy bar (CSS shows it at <=700px only). Only Sheets Toolkit is on sale; other product pages are "coming soon". */
     if (!/^\/(products\/(?!index)[^\/]+\.html|sheets-toolkit\.html)$/.test(location.pathname)) return;
-    var b = document.querySelector('a.btn[href*="pay.html?p="]'); if (!b) return;
+    var b = document.querySelector('a.btn[href*="pay.html?p=sheets-toolkit"]'); if (!b) return;
     var bar = document.createElement('div'); bar.className = 'buybar';
     bar.innerHTML = '<span class="buybar-p"><b data-price="addon">' + P.fmt.addon + '</b> once, lifetime<small>' + P.fmt.refund + '</small></span><a class="btn" data-track="buy_click" href="' + b.getAttribute('href') + '">Buy now</a>';
     document.body.appendChild(bar); document.body.classList.add('has-buybar');
